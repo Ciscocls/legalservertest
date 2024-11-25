@@ -17,13 +17,13 @@ username = "API_Cisco"
 password = "ZhCLVDF2cw2z"
 
 # Send the GET request with Basic Authentication
-response = requests.get(api_url, auth=HTTPBasicAuth(username, password))
+response = requests.get(api_url, auth=HTTPBasicAuth(username, password), headers=headers)
 
 # Check the response status
 if response.status_code == 200:
     print("Data fetched successfully.")
-
- # Try to parse the XML response
+    
+    # Try to parse the XML response
     try:
         # Parse the XML data
         root = ET.fromstring(response.content)
@@ -57,6 +57,7 @@ if response.status_code == 200:
 else:
     print(f"Failed to fetch data. Status code: {response.status_code}")
     print(response.text)
+
   
   # Define SQL Server connection details
 server = 'clsmf.database.windows.net'  
@@ -64,9 +65,59 @@ database = 'clsmf'
 username = 'clsmf'  
 password = 'RBDfdc123orlando!'  
 
-# Establish connection to SQL Server ( does not work)
+# Establish connection to SQL Server 
 conn = pymssql.connect(server='clsmf.database.windows.net',
                        user='clsmf',
                        password='RBDfdc123orlando!',
                        database='clsmf')                    
 cursor = conn.cursor()
+
+# Define the SQL query to insert data (Does not work)
+insert_query = """
+INSERT INTO casedatatest (Database_ID, Assigned_Office, Assigned_Program, CaseID_Count, County_of_Residence, Date_Closed, Date_Opened, Disposition, Full_Name, Formulaic_Client_ID, Funding_Source, Intake_Month, Legal_Problem_Code, Matter_Case_ID, Number_of_Days_Prescreen_to_Intake, Number_of_Days_Prescreen_to_Opened, Number_of_People_18_and_Over, Number_of_People_under_18, Primary_Advocate, Row_Count, Secondary_Funding_Code, Senior_Characteristics, Total_Household_Size, Total_Number_Helped)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+"""
+data_dict = json.loads(json_data)
+json_data = response.text
+
+# Process and insert the fetched data into SQL Server
+if 'ROWSET' in data_dict and 'ROW' in data_dict['ROWSET']:
+    for item in data_dict['ROWSET']['ROW']:
+        # Extract the necessary data from the item
+        Database_ID = item.get('Database_ID')
+        Assigned_Office = item.get('Assigned_Office')
+        Assigned_Program = item.get('Assigned_Program')
+        CaseID_Count = item.get('CaseID_Count')
+        County_of_Residence = item.get('County_of_Residence')
+        Date_Closed = item.get('Date_Closed')
+        Date_Opened = item.get('Date_Opened')
+        Disposition = item.get('Disposition')
+        Full_Name = item.get('Full_Name')
+        Formulaic_Client_ID = item.get('Formulaic_Client_ID')
+        Funding_Source = item.get('Funding_Source')
+        Intake_Month = item.get('Intake_Month')
+        Legal_Problem_Code = item.get('Legal_Problem_Code')
+        Matter_Case_ID = item.get('Matter_Case_ID')
+        Number_of_Days_Prescreen_to_Intake = item.get('Number_of_Days_Prescreen_to_Intake')
+        Number_of_Days_Prescreen_to_Opened = item.get('Number_of_Days_Prescreen_to_Opened')
+        Number_of_People_18_and_Over = item.get('Number_of_People_18_and_Over')
+        Number_of_People_under_18 = item.get('Number_of_People_under_18')
+        Primary_Advocate = item.get('Primary_Advocate')
+        Row_Count = item.get('Row_Count')
+        Secondary_Funding_Code = item.get('Secondary_Funding_Code')
+        Senior_Characteristics = item.get('Senior_Characteristics')
+        Total_Household_Size = item.get('Total_Household_Size')
+        Total_Number_Helped = item.get('Total_Number_Helped')
+
+       # Insert the data into the database
+    cursor.execute(insert_query, (Database_ID, Assigned_Office, Assigned_Program, CaseID_Count, County_of_Residence, Date_Closed, Date_Opened, Disposition, Full_Name, Formulaic_Client_ID, Funding_Source, Intake_Month, Legal_Problem_Code, Matter_Case_ID, Number_of_Days_Prescreen_to_Intake, Number_of_Days_Prescreen_to_Opened, Number_of_People_18_and_Over, Number_of_People_under_18, Primary_Advocate, Row_Count, Secondary_Funding_Code, Senior_Characteristics, Total_Household_Size, Total_Number_Helped))
+
+# Commit the transaction
+conn.commit()
+
+# Close the database connection
+cursor.close()
+conn.close()
+
+print("Data inserted successfully into the SQL Server database.")
+
