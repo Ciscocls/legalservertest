@@ -1,0 +1,27 @@
+-- Creating the table named casedata for legalserver records to go in 
+
+CREATE TABLE casedata (
+    MatterID INT PRIMARY KEY NOT NULL,          
+    AssignedOffice NVARCHAR(50),     
+    AssignedProgram NVARCHAR(50),      
+    CaseIDCount INT,
+	CountyofResidence NVARCHAR(100),
+	DateClosed DATE,
+	DateOpened DATE,
+	FormulaicClientID NVARCHAR(100),
+	Disposition NVARCHAR(100),
+	FullName NVARCHAR(100),
+	FundingSource NVARCHAR(300),
+	IntakeMonth DATE,
+	LegalProblemCode NVARCHAR(250),
+	NumberofDaysPrescreentoIntake INT,
+	NumberofDaysPrescreentoOpened INT,
+	NumberofPeople18andOver INT,
+	NumberofPeopleunder18 INT,
+	PrimaryAdvocate NVARCHAR(100),
+	RecordCount INT,
+	SecondaryFundingCode NVARCHAR(250),
+	SeniorCharacteristics NVARCHAR(250),
+	TotalHouseholdSize INT,
+	TotalNumberHelped INT,
+);
